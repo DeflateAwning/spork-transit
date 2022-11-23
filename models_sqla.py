@@ -35,7 +35,8 @@ class Role(db.Model, RoleMixin):
     name = Column(String(255), unique=True)
     description = Column(String(255))
     level = Column(Integer)
-    permissions = Column(String(255))
+    #permissions = Column(String(255))
+    permissions = Column(JSON)
 
 
 class User(db.Model, UserMixin):
@@ -61,6 +62,7 @@ class RolesUsers(db.Model):
     id = Column(Integer, primary_key=True)
     user_id = Column('user_id', Integer, ForeignKey('user.id'))
     role_id = Column('role_id', Integer, ForeignKey('role.id'))
+
 
 
 ###############################################################################

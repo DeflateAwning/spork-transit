@@ -1,22 +1,23 @@
-# Flask-Bootstrap-Anywhere
-
-This is a skeleton application written in python using Flask microframework.
-It comes with support for user registration, login, session management,
-password recovery, password reset and database connection.
-These features are achieved by `Flask-Security-Too`, which in turn achieves
-them by various flask extensions such as `Flask-Login`, `Flask-WTF` etc.
-Front-end styling is done using `Bootstrap`.
+# Spork Transit
 
 ## Motivation
 
-In general, many web applications require some level of user-management.
-While `Django` can be suitable for big projects, for relatively small projects
-it might be an overkill. Further, `Flask` offers more flexibility.
-However, with `Flask` being a "microframework", we have to choose from a variety
-of plugins to build a working system.
+My biggest goals are:
+1. fix the fucked up time estimations bc buses vanish periodically
+2. show every single possible route anytime you're trying to navigate, and let the user decide based on as much data as possible which one they wanna take
+    * to evaluate stops for errands and things, for example
+    * because people can run/walk fast if they're late
 
-This application fits together a handful of such commonly used plugins
-for commonly required tasks, and aims to save developers' effort.
+Other goals:
+* Optimize routes reliably by earliest arrival time.
+* Optimize routes by metrics like "longest time sheltered" if it's raining
+* Show the temperature in the app
+
+Low-priority goals:
+* Make a stats page
+    * Total Routes
+    * Number of Active Buses at any point
+
 
 ## Features
 
@@ -81,6 +82,10 @@ OR
 ```
 $ export FLASK_APP="server:webapp"
 $ flask run
+```
+
+```ps1
+$env:FLASK_APP = 'server:webapp';
 ```
 
 (Other WSGI-based deployments are also possible. e.g. `gunicorn`)

@@ -48,6 +48,7 @@ from flask import (
     flash,
     session,
     Response,
+    jsonify
 )
 from flask_security import (
     Security,
@@ -65,6 +66,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 
 from models_sqla import db, user_datastore, CustomLoginForm, CustomRegisterForm
+from models_sqla import GTFSCalendar, GTFSCalendarDates, GTFSRoutes, GTFSRTAlerts, GTFSShapes, GTFSStops, GTFSStopTimes, GTFSTrips, GTFSRTAlertsEntities, GTFSRTPositions, GTFSRTUpdates
 from settings import app
 import constants
 
@@ -284,11 +286,96 @@ def show_settings():
 
 
 @webapp.route("/")
-@auth_required()
+#@auth_required()
 def show_home():
     data = {}
     data["title"] = "Home"
     return render_template("home.html", data=data)
+
+
+@webapp.route("/map1")
+def show_map():
+    data = {}
+    data["title"] = "Map 1"
+    data["mapbox_token"] = 'pk.eyJ1IjoidHJhbnNpdC1jaGV3ZXIiLCJhIjoiY2xiMGU4ejc5MTJjNTNwbTlnNnR3MXJqdiJ9.pV8G7wimWWx8HZrf-pOa8A' # FIXME move to settings
+    return render_template("map1.html", data=data)
+
+
+@webapp.route("/map1/stops_json")
+def get_stops_json():
+    stops = db.session.query(GTFSStops).all()
+
+    out = {
+        'type': 'FeatureCollection',
+        'features': []
+    }
+
+    for stop in stops:
+        out["features"].append({
+            'type': 'Feature',
+            'properties': {
+                'description':f"<b>Stop #{stop.stop_id}:</b> {stop.stop_name}.",
+                'icon': 'stop'
+            },
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [stop.stop_lon, stop.stop_lat]
+            }
+        })
+
+    return jsonify(out)
+
+@webapp.route("/map1/shapes_json")
+def get_shape_paths_json():
+    out = {
+        'type': 'FeatureCollection',
+        'features': []
+    }
+
+    for shape in db.session.query(GTFSShapes.shape_id).distinct().all():
+        this_line = {
+            'type': 'Feature',
+            'properties': {
+
+            },
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': []
+            }
+        }
+
+        for point in db.session.query(GTFSShapes).filter(GTFSShapes.shape_id == shape.shape_id).all():
+            this_line["geometry"]["coordinates"].append([point.shape_pt_lon, point.shape_pt_lat])
+
+        out["features"].append(this_line)
+
+    return jsonify(out)
+
+
+@webapp.route("/map1/positions_json")
+def get_positions_json():
+    buses = db.session.query(GTFSRTPositions, GTFSTrips.trip_headsign, GTFSRoutes.route_short_name, GTFSRoutes.route_long_name) \
+        .filter((datetime.datetime.utcnow() - GTFSRTPositions.timestamp) < datetime.timedelta(minutes=10)).limit(100).all() # FIXME this part doesn't work
+
+    out = {
+        'type': 'FeatureCollection',
+        'features': []
+    }
+
+    for bus in buses:
+        out["features"].append({
+            'type': 'Feature',
+            'properties': {
+                'description':f"<b>Route {bus.route_short_name}</b>",
+                'icon': 'stop'
+            },
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [bus.longitude, bus.latitude]
+            }
+        })
+
+    return jsonify(out)
 
 
 ###############################################################################

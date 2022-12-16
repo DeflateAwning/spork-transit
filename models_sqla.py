@@ -10,9 +10,10 @@ Created on Sat Feb 06 19:55:04 2021
 
 from sqlalchemy import (Column, Integer, String, Boolean, DateTime, Date, JSON, ForeignKey, Float, Time)
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.mutable import MutableList
 
 from flask_sqlalchemy import SQLAlchemy
-from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore
+from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore, AsaList
 from flask_security.forms import LoginForm, RegisterForm, StringField, Required
 
 ###############################################################################
@@ -34,8 +35,7 @@ class Role(db.Model, RoleMixin):
 	name = Column(String(255), unique=True)
 	description = Column(String(255))
 	level = Column(Integer)
-	#permissions = Column(String(255))
-	permissions = Column(JSON)
+	permissions = Column(MutableList.as_mutable(AsaList()), nullable=True)
 
 
 class User(db.Model, UserMixin):

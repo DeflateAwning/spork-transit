@@ -3,15 +3,24 @@
 ## Motivation
 
 My biggest goals are:
-1. fix the fucked up time estimations bc buses vanish periodically
+1. fix the fucked up time estimations bc buses "vanish" periodically
 2. show every single possible route anytime you're trying to navigate, and let the user decide based on as much data as possible which one they wanna take
     * to evaluate stops for errands and things, for example
     * because people can run/walk fast if they're late
+3. Push notifications of service changes, with text diffs of services messages.
+
+First tasks:
+* Create a map with easy selection of up to 10 routes, which shows all buses live and with a historical time slider.
+* Create a table with easy selection of routes, which shows ETAs (based on schedule, updates, and positions/schedule)
+* Create a route-finding algo, esp. for train-to-train transfers
+* Have an easy way to lookup the bus number of any bus, for cases where you've lost property on a bus (lost-and-found)
 
 Other goals:
 * Optimize routes reliably by earliest arrival time.
 * Optimize routes by metrics like "longest time sheltered" if it's raining
 * Show the temperature in the app
+* Voice alerts of where a bus is, for if you're running for a bus/need to leave soon/running for a bus
+* Provide standardized tips, like "X with arms to signal that you don't want to board", or "waive if you want to board"
 
 Low-priority goals:
 * Make a stats page
@@ -60,7 +69,7 @@ Getting started with the basic application is straightforward.
 
 * Install the requirements from the `requirements.txt`,
 
-```console
+```bash
 $ pip3 install -r requirements.txt
 ```
 
@@ -73,19 +82,22 @@ There are inline explanations in the settings file if the variables are not self
 
 Run the application using,
 
-````console
+````bash
 $ python server.py
 ````
 
 OR
 
-```
+```bash
 $ export FLASK_APP="server:webapp"
+$ export FLASK_DEBUG=1
 $ flask run
 ```
 
 ```ps1
 $env:FLASK_APP = 'server:webapp';
+$env:FLASK_DEBUG = '1';
+flask run
 ```
 
 (Other WSGI-based deployments are also possible. e.g. `gunicorn`)

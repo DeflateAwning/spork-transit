@@ -1,0 +1,75 @@
+{% set active_page = "home" %}
+{% include "header.html" %}
+<div class="container p-3">
+    <div class="card">
+        <div class="card-header lead">
+            Map!
+        </div>
+        <div class="card-body">
+            
+            <div id='map' style='width: 100%; height: 800px;'></div>
+            <script>
+                mapboxgl.accessToken = '{{ data["mapbox_token"] }}';
+                var map = new mapboxgl.Map({
+                    container: 'map',
+                    style: 'mapbox://styles/mapbox/streets-v11',
+                    zoom: 12,
+                    center: [-114.0379, 51.0348]
+                });
+
+                map.on('load', () => {
+                    map.addSource('gtfs_stops', {
+                        'type': 'geojson',
+                        'data': '/map1/stops_json'
+                    });
+                    map.addSource('gtfs_shapes', {
+                        'type': 'geojson',
+                        'data': '/map1/shapes_json'
+                    });
+
+                    map.addLayer({
+                        'id': 'gtfs_shapes_layer',
+                        'type': 'line',
+                        'source': 'gtfs_shapes',
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': 'red',
+                            'line-width': {
+                                'base': 1.75,
+                                'stops': [
+                                    [12, 2],
+                                    [22, 180]
+                                ]
+                            }
+                        }}
+                    );
+                    map.addLayer({
+                        'id': 'gtfs_stops_layer',
+                        'type': 'circle',
+                        'source': 'gtfs_stops',
+                        'paint': {
+                            // Make circles larger as the user zooms from z12 to z22.
+                            'circle-radius': {
+                                'base': 1.75,
+                                'stops': [
+                                    [12, 2],
+                                    [22, 180]
+                                ]
+                            }
+                        }}
+                    );
+                    
+                });
+            </script>
+            
+
+
+
+        </div>
+    </div>
+</div>
+
+{% include "footer.html" %}
